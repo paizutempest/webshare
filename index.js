@@ -6,7 +6,7 @@ import gradient from 'gradient-string';
 import { input, confirm } from '@inquirer/prompts';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 
-const CAPSOLVER_KEY = "CAP-FE27EC64650847CADD1684463C7828F01B4CD35F24241F8D5FAD14330A0AC5C8";
+const CAPSOLVER_KEY = "CAP-GANTI KE TOKEN CAPSOLVER KAMU";
 const EMAIL_DOMAIN = "@anbu.my.id";
 const SITE_KEY = "6LeHZ6UUAAAAAKat_YS--O2tj_by3gv3r_l03j9d"; 
 
