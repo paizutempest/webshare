@@ -26,8 +26,8 @@ function displayBanner() {
     ██║███╗██║██╔══╝  ██╔══██╗╚════██║██╔══██║██╔══██║██╔══██╗██╔══╝  
     ╚███╔███╔╝███████╗██████╔╝███████║██║  ██║██║  ██║██║  ██║███████╗
      ╚══╝╚══╝ ╚══════╝╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝
-    WEBSHARE.IO API RADAR ENGINE
-    By Paizutempest | Pure HTTP Request & Custom Proxy Options
+    WEBSHARE.IO AUTO REGIESTER
+    By Paizutempest | Bypass Captcha & Get Proxy Residential
     `));
 }
 
