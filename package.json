@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node webshare_playwright.js"
+    "start": "node index.js"
   },
   "author": "paizutempest",
   "license": "MIT",
