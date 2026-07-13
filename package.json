@@ -1,7 +1,7 @@
 {
   "name": "webshare-auto-register",
   "version": "1.0.0",
-  "description": "Automated HTTP Radar Engine for Webshare proxy extraction",
+  "description": "Kalau gapunya config bisa tanpa config dulu nanti jika kena rate limit baru gunakan config yang di dapat",
   "main": "index.js",
   "type": "module",
   "scripts": {
