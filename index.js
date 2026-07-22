@@ -7,7 +7,7 @@ import { input, confirm } from '@inquirer/prompts';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 
 const CAPSOLVER_KEY = "CAP-GANTI KE TOKEN CAPSOLVER KAMU";
-const EMAIL_DOMAIN = "@anbu.my.id"; // BISA GANTI KE EMAIL TMAIL KAMU
+const EMAIL_DOMAIN = "@anbu.my.id"; // BISA GANTI KE EMAIL TMAIL KAMU 
 const SITE_KEY = "6LeHZ6UUAAAAAKat_YS--O2tj_by3gv3r_l03j9d"; // BISA GANTI SITE_KEY SNIFF LAGI DI WEBSHARE
 
 process.on('uncaughtException', (err) => {
