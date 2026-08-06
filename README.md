@@ -1,4 +1,4 @@
-# ⚡ Webshare Account Creator & Proxy Extractor
+# ⚡ Webshare Auto Reg & Proxy Injector
 
 <p align="center">
   <img src="https://img.shields.io/github/stars/paizutempest/webshare?style=for-the-badge&color=00FF88" alt="Stars">
@@ -7,35 +7,36 @@
 </p>
 
 <p align="center">
-  <b>Automated HTTP Radar Engine</b> designed to generate accounts, bypass reCAPTCHA Enterprise via Capsolver, and seamlessly inject newly formatted residential backconnect proxies directly into a local configuration layout.
+  <b>Script bot sat-set</b> buat bikin akun Webshare otomatis, bypass reCAPTCHA Enterprise pake CapSolver / 2Captcha, terus langsung nyomot proxy residential-nya tanpa ribet. Tinggal bikin, duduk manis, proxy langsung masuk <code>config.txt</code>! ❤️
 </p>
 
 ---
 
-## 🚀 Key Features
+## 🚀 Fitur Kece
 
-* **Dual Operational Modes:** Supports pure HTTP request handling (No-Browser API mode) for high efficiency, alongside advanced Playwright network interception.
-* **Smart Failover Retry:** Zero-drop slot queue control. If a cycle fails mid-way, the script automatically retries the exact same instance until completion.
-* **Adaptive Network Routing:** Dynamically rotates outbound traffic using clean active residential lines parsed line-by-line from your `config.txt`.
-* **Instant Extraction:** Fetches active `plan_id` objects instantly upon registration, formats credentials using the standard `-rotate` template, and dumps them into the active pool.
+* ❤️ **Dual Engine Captcha Solver:** Bebas pilih mau pake CapSolver atau 2Captcha langsung dari terminal.
+* 💖 **Dual Mode Super Kenceng:** Bisa jalan full HTTP Request (API Mode, hemat RAM tanpa browser) atau pake Playwright kalo butuh pantau network.
+* 💕 **Auto Retry Anti-Gagal:** Slot antrean gak bakal hilang. Kalo pas tengah jalan ada error, bot bakal otomatis ngulang di slot yang sama sampe dapet.
+* 💗 **Rotasi Network Pintar:** Lalu lintas jaringan otomatis gantian pake proxy bersih dari `config.txt` biar gak gampang kena rate limit.
+* ❤️ **Auto Inject Proxy:** Langsung narik `plan_id` aktif abis daftar, di-format jadi kredensial `-rotate`, terus otomatis disuntik masuk ke file `config.txt` lokal lo.
 
 ---
 
-## 🛠️ Stack & Dependencies
+## 🛠️ Tech Stack & Sesajen
 
-The core environment relies completely on a modern vanilla JavaScript architecture managed under Node.js:
+Bikinnya full pake Vanilla JavaScript biar kenceng, ringan, dan gak banyak gaya di Node.js:
 
 * **Runtime:** Node.js (v18+)
 * **HTTP Client:** [Axios](https://github.com/axios/axios)
-* **Automation Interface:** [Playwright](https://playwright.dev/)
-* **Captcha Handler:** [Capsolver API SDK](https://www.capsolver.com/)
-* **UI & Logging:** `chalk`, `dayjs`, `gradient-string`, `@inquirer/prompts`
+* **Automation:** [Playwright](https://playwright.dev/)
+* **Captcha Solver:** CapSolver API & 2Captcha API
+* **Tampilan Terminal:** `chalk`, `dayjs`, `gradient-string`, `@inquirer/prompts`
 
 ---
 
-## 📋 Installation
+## 📋 Cara Pasang & Gas
 
-1. **Clone the repository:**
+1. **Clone repo ini:**
    ```bash
    git clone [https://github.com/paizutempest/webshare.git](https://github.com/paizutempest/webshare.git)
    cd webshare
