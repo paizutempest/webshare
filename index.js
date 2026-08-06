@@ -3,12 +3,11 @@ import axios from 'axios';
 import chalk from 'chalk';
 import dayjs from 'dayjs';
 import gradient from 'gradient-string';
-import { input, confirm } from '@inquirer/prompts';
+import { input, confirm, select } from '@inquirer/prompts';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 
-const CAPSOLVER_KEY = "CAP-GANTI KE TOKEN CAPSOLVER KAMU";
-const EMAIL_DOMAIN = "@anbu.my.id"; // BISA GANTI KE EMAIL TMAIL KAMU 
-const SITE_KEY = "6LeHZ6UUAAAAAKat_YS--O2tj_by3gv3r_l03j9d"; // BISA GANTI SITE_KEY SNIFF LAGI DI WEBSHARE
+const EMAIL_DOMAIN = "@paytesacard.com";
+const SITE_KEY = "6LeHZ6UUAAAAAKat_YS--O2tj_by3gv3r_l03j9d";
 
 process.on('uncaughtException', (err) => {
     if (err.code === 'ECONNRESET' || err.message.includes('TLS')) return;
@@ -26,7 +25,7 @@ function displayBanner() {
     ██║███╗██║██╔══╝  ██╔══██╗╚════██║██╔══██║██╔══██║██╔══██╗██╔══╝  
     ╚███╔███╔╝███████╗██████╔╝███████║██║  ██║██║  ██║██║  ██║███████╗
      ╚══╝╚══╝ ╚══════╝╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝
-    WEBSHARE.IO AUTO REGIESTER
+    WEBSHARE.IO AUTO REGISTER
     By Paizutempest | Bypass Captcha & Get Proxy Residential
     `));
 }
@@ -67,36 +66,74 @@ function getRandomString(length) {
     return result;
 }
 
-async function solveCaptcha() {
-    log.process("Meminta token solusi reCAPTCHA dari Capsolver...");
-    try {
-        const createTask = await axios.post("https://api.capsolver.com/createTask", {
-            clientKey: CAPSOLVER_KEY,
-            task: {
-                type: "ReCaptchaV2EnterpriseTaskProxyLess",
-                websiteURL: "https://dashboard.webshare.io/register?source=login_signup_link",
-                websiteKey: SITE_KEY
-            }
-        });
+async function solveCaptcha(provider, apiKey) {
+    const providerName = provider === 'capsolver' ? 'CapSolver' : '2Captcha';
+    log.process(`Meminta token solusi reCAPTCHA dari ${providerName}...`);
 
-        if (createTask.data.errorId > 0) throw new Error(createTask.data.errorDescription);
-        const taskId = createTask.data.taskId;
-        
-        while (true) {
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            const getResult = await axios.post("https://api.capsolver.com/getTaskResult", {
-                clientKey: CAPSOLVER_KEY,
-                taskId: taskId
+    try {
+        if (provider === 'capsolver') {
+            const createTask = await axios.post("https://api.capsolver.com/createTask", {
+                clientKey: apiKey,
+                task: {
+                    type: "ReCaptchaV2EnterpriseTaskProxyLess",
+                    websiteURL: "https://dashboard.webshare.io/register?source=login_signup_link",
+                    websiteKey: SITE_KEY
+                }
             });
 
-            if (getResult.data.status === "ready") {
-                log.success("Token reCAPTCHA berhasil didapatkan.");
-                return getResult.data.solution.gRecaptchaResponse;
+            if (createTask.data.errorId > 0) throw new Error(createTask.data.errorDescription);
+            const taskId = createTask.data.taskId;
+
+            while (true) {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                const getResult = await axios.post("https://api.capsolver.com/getTaskResult", {
+                    clientKey: apiKey,
+                    taskId: taskId
+                });
+
+                if (getResult.data.status === "ready") {
+                    log.success("Token reCAPTCHA berhasil didapatkan (CapSolver).");
+                    return getResult.data.solution.gRecaptchaResponse;
+                }
+                if (getResult.data.status === "failed") throw new Error("CapSolver gagal menyelesaikan captcha.");
             }
-            if (getResult.data.status === "failed") throw new Error("Capsolver gagal menyelesaikan captcha.");
+
+        } else if (provider === '2captcha') {
+            // Gunakan API v2 (api.2captcha.com) dengan tipe RecaptchaV2EnterpriseTaskProxyless
+            const createTask = await axios.post("https://api.2captcha.com/createTask", {
+                clientKey: apiKey,
+                task: {
+                    type: "RecaptchaV2EnterpriseTaskProxyless",
+                    websiteURL: "https://dashboard.webshare.io/register?source=login_signup_link",
+                    websiteKey: SITE_KEY
+                }
+            });
+
+            if (createTask.data.errorId > 0) {
+                throw new Error(createTask.data.errorDescription || `Error ID: ${createTask.data.errorId}`);
+            }
+
+            const taskId = createTask.data.taskId;
+
+            while (true) {
+                await new Promise(resolve => setTimeout(resolve, 5000));
+                const getResult = await axios.post("https://api.2captcha.com/getTaskResult", {
+                    clientKey: apiKey,
+                    taskId: taskId
+                });
+
+                if (getResult.data.status === "ready") {
+                    log.success("Token reCAPTCHA berhasil didapatkan (2Captcha).");
+                    return getResult.data.solution.gRecaptchaResponse || getResult.data.solution.token;
+                }
+
+                if (getResult.data.status === "failed" || getResult.data.errorId > 0) {
+                    throw new Error(getResult.data.errorDescription || "2Captcha gagal menyelesaikan captcha.");
+                }
+            }
         }
     } catch (error) {
-        log.error("Gagal mendapatkan solusi Captcha.", error.message);
+        log.error(`Gagal mendapatkan solusi Captcha dari ${providerName}.`, error.message);
         return null;
     }
 }
@@ -177,7 +214,7 @@ async function extractProxyCredentials(authToken, agent) {
     }
 }
 
-async function executeSingleAPICycle(currentCount, customPassword, proxyUrl) {
+async function executeSingleAPICycle(currentCount, customPassword, proxyUrl, captchaProvider, apiKey) {
     const targetEmail = `${getRandomString(8)}${EMAIL_DOMAIN}`;
     let agent = null;
 
@@ -189,7 +226,7 @@ async function executeSingleAPICycle(currentCount, customPassword, proxyUrl) {
         log.info("Berjalan tanpa proxy (Menggunakan IP Publik Lokal/VPS)...");
     }
 
-    const captchaToken = await solveCaptcha();
+    const captchaToken = await solveCaptcha(captchaProvider, apiKey);
     if (!captchaToken) return false;
 
     const authToken = await registerViaAPI(targetEmail, customPassword, captchaToken, agent);
@@ -199,7 +236,7 @@ async function executeSingleAPICycle(currentCount, customPassword, proxyUrl) {
     return isSuccessExtract;
 }
 
-async function startEngine(count, customPassword, useProxy) {
+async function startEngine(count, customPassword, useProxy, captchaProvider, apiKey) {
     log.info(`Mesin dijalankan (API Mode). Target: ${count} proxy residential...\n`);
     
     let currentAccount = 1;
@@ -219,7 +256,7 @@ async function startEngine(count, customPassword, useProxy) {
         }
         
         log.info(`➔ Memulai proses pengerjaan untuk Slot Akun ke-${currentAccount}`);
-        const isCycleSuccess = await executeSingleAPICycle(currentAccount, customPassword, proxyCandidate);
+        const isCycleSuccess = await executeSingleAPICycle(currentAccount, customPassword, proxyCandidate, captchaProvider, apiKey);
         
         if (isCycleSuccess) {
             log.success(`Slot Akun ke-${currentAccount} selesai diproses dengan sukses.\n`);
@@ -239,7 +276,29 @@ async function startEngine(count, customPassword, useProxy) {
 (async function main() {
     displayBanner();
     
-    const useProxyOpt = await confirm({ message: "Apakah Anda ingin menggunakan daftar proxy dari config.txt?", default: true });
+    // 1. Opsi Proxy
+    const useProxyOpt = await confirm({ 
+        message: "Apakah Anda ingin menggunakan daftar proxy dari config.txt?", 
+        default: true 
+    });
+
+    // 2. Opsi Provider Captcha
+    const captchaProvider = await select({
+        message: "Pilih Provider Captcha Solver:",
+        choices: [
+            { name: "CapSolver", value: "capsolver" },
+            { name: "2Captcha", value: "2captcha" }
+        ]
+    });
+
+    // 3. Input API Key sesuai pilihan provider
+    const defaultApiKey = captchaProvider === '2captcha' ? 'DEFAULT-GANTI_KE_TOKEN_2CAPTCHA_KAMU' : 'DEFAULT-CAP-GANTI_KE_TOKEN_CAPSOLVER_KAMU';
+    const apiKey = await input({ 
+        message: `Masukkan API Key ${captchaProvider === 'capsolver' ? 'CapSolver' : '2Captcha'}:`, 
+        default: defaultApiKey 
+    });
+
+    // 4. Input Password & Jumlah Akun
     const inputPassword = await input({ message: "Masukkan Format Password akun:", default: "Paizutempest123!" });
     const jumlahAkun = await input({ message: "Berapa akun yang ingin Anda buat?", default: "1" });
     
@@ -250,5 +309,5 @@ async function startEngine(count, customPassword, useProxy) {
     }
     
     console.log("");
-    await startEngine(parsedCount, inputPassword, useProxyOpt);
+    await startEngine(parsedCount, inputPassword, useProxyOpt, captchaProvider, apiKey);
 })();
