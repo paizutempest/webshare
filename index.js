@@ -6,7 +6,7 @@ import gradient from 'gradient-string';
 import { input, confirm, select } from '@inquirer/prompts';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 
-const EMAIL_DOMAIN = "@paytesacard.com";
+const EMAIL_DOMAIN = "@paizutempest.info";
 const SITE_KEY = "6LeHZ6UUAAAAAKat_YS--O2tj_by3gv3r_l03j9d";
 
 process.on('uncaughtException', (err) => {
